@@ -57,7 +57,7 @@ func validateLowNodeUtilizationParams(params *api.StrategyParameters) error {
 	if params == nil || params.NodeResourceUtilizationThresholds == nil {
 		return fmt.Errorf("NodeResourceUtilizationThresholds not set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.NodeResourceUtilizationThresholds.ThresholdPriority != nil && params.NodeResourceUtilizationThresholds.ThresholdPriorityClassName != "" {
 		return fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 

@@ -167,7 +167,7 @@ func TestTopologySpreadConstraint(t *testing.T) {
 				},
 			}),
 			expectedEvictedCount: 1,
-			strategy:             api.DeschedulerStrategy{Enabled: true, Params: &api.StrategyParameters{Namespaces: &api.Namespaces{Exclude: []string{"kube-system"}}}},
+			strategy:             api.DeschedulerStrategy{Enabled: true, Params: &api.StrategyParameters{RemovePodsViolatingTopologySpreadConstraint:&api.RemovePodsViolatingTopologySpreadConstraint{&api.Filter{Namespaces: &api.Namespaces{Exclude: []string{"kube-system"}}}}}},
 			namespaces:           []string{"ns1"},
 		},
 		{

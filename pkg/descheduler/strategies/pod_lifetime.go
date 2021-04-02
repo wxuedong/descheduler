@@ -45,10 +45,10 @@ func validatePodLifeTimeParams(params *api.StrategyParameters) error {
 	}
 
 	// At most one of include/exclude can be set
-	if params.Namespaces != nil && len(params.Namespaces.Include) > 0 && len(params.Namespaces.Exclude) > 0 {
+	if params.PodLifeTime.Namespaces != nil && len(params.PodLifeTime.Namespaces.Include) > 0 && len(params.PodLifeTime.Namespaces.Exclude) > 0 {
 		return fmt.Errorf("only one of Include/Exclude namespaces can be set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.PodLifeTime.ThresholdPriority != nil && params.PodLifeTime.ThresholdPriorityClassName != "" {
 		return fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 
@@ -69,9 +69,9 @@ func PodLifeTime(ctx context.Context, client clientset.Interface, strategy api.D
 	}
 
 	var includedNamespaces, excludedNamespaces []string
-	if strategy.Params.Namespaces != nil {
-		includedNamespaces = strategy.Params.Namespaces.Include
-		excludedNamespaces = strategy.Params.Namespaces.Exclude
+	if strategy.Params.PodLifeTime.Namespaces != nil {
+		includedNamespaces = strategy.Params.PodLifeTime.Namespaces.Include
+		excludedNamespaces = strategy.Params.PodLifeTime.Namespaces.Exclude
 	}
 
 	evictable := podEvictor.Evictable(evictions.WithPriorityThreshold(thresholdPriority))
@@ -91,7 +91,7 @@ func PodLifeTime(ctx context.Context, client clientset.Interface, strategy api.D
 	for _, node := range nodes {
 		klog.V(1).InfoS("Processing node", "node", klog.KObj(node))
 
-		pods := listOldPodsOnNode(ctx, client, node, includedNamespaces, excludedNamespaces, strategy.Params.LabelSelector, *strategy.Params.PodLifeTime.MaxPodLifeTimeSeconds, filter)
+		pods := listOldPodsOnNode(ctx, client, node, includedNamespaces, excludedNamespaces, strategy.Params.PodLifeTime.LabelSelector, *strategy.Params.PodLifeTime.MaxPodLifeTimeSeconds, filter)
 		for _, pod := range pods {
 			success, err := podEvictor.EvictPod(ctx, pod, node, "PodLifeTime")
 			if success {

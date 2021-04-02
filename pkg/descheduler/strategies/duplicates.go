@@ -41,10 +41,10 @@ func validateRemoveDuplicatePodsParams(params *api.StrategyParameters) error {
 		return nil
 	}
 	// At most one of include/exclude can be set
-	if params.Namespaces != nil && len(params.Namespaces.Include) > 0 && len(params.Namespaces.Exclude) > 0 {
+	if params.RemoveDuplicates.Namespaces != nil && len(params.RemoveDuplicates.Namespaces.Include) > 0 && len(params.RemoveDuplicates.Namespaces.Exclude) > 0 {
 		return fmt.Errorf("only one of Include/Exclude namespaces can be set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.RemoveDuplicates.ThresholdPriority != nil && params.RemoveDuplicates.ThresholdPriorityClassName != "" {
 		return fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 
@@ -78,9 +78,9 @@ func RemoveDuplicatePods(
 	}
 
 	var includedNamespaces, excludedNamespaces []string
-	if strategy.Params != nil && strategy.Params.Namespaces != nil {
-		includedNamespaces = strategy.Params.Namespaces.Include
-		excludedNamespaces = strategy.Params.Namespaces.Exclude
+	if strategy.Params != nil && strategy.Params.RemoveDuplicates.Namespaces != nil {
+		includedNamespaces = strategy.Params.RemoveDuplicates.Namespaces.Include
+		excludedNamespaces = strategy.Params.RemoveDuplicates.Namespaces.Exclude
 	}
 
 	evictable := podEvictor.Evictable(evictions.WithPriorityThreshold(thresholdPriority))

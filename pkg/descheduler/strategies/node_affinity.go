@@ -32,14 +32,14 @@ import (
 )
 
 func validatePodsViolatingNodeAffinityParams(params *api.StrategyParameters) error {
-	if params == nil || len(params.NodeAffinityType) == 0 {
+	if params == nil || params.NodeAffinityType == nil || len(params.NodeAffinityType.List) == 0 {
 		return fmt.Errorf("NodeAffinityType is empty")
 	}
 	// At most one of include/exclude can be set
-	if params.Namespaces != nil && len(params.Namespaces.Include) > 0 && len(params.Namespaces.Exclude) > 0 {
+	if params.NodeAffinityType.Namespaces != nil && len(params.NodeAffinityType.Namespaces.Include) > 0 && len(params.NodeAffinityType.Namespaces.Exclude) > 0 {
 		return fmt.Errorf("only one of Include/Exclude namespaces can be set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.NodeAffinityType.ThresholdPriority != nil && params.NodeAffinityType.ThresholdPriorityClassName != "" {
 		return fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 
@@ -59,14 +59,14 @@ func RemovePodsViolatingNodeAffinity(ctx context.Context, client clientset.Inter
 	}
 
 	var includedNamespaces, excludedNamespaces []string
-	if strategy.Params.Namespaces != nil {
-		includedNamespaces = strategy.Params.Namespaces.Include
-		excludedNamespaces = strategy.Params.Namespaces.Exclude
+	if strategy.Params.NodeAffinityType.Namespaces != nil {
+		includedNamespaces = strategy.Params.NodeAffinityType.Namespaces.Include
+		excludedNamespaces = strategy.Params.NodeAffinityType.Namespaces.Exclude
 	}
 
 	evictable := podEvictor.Evictable(evictions.WithPriorityThreshold(thresholdPriority))
 
-	for _, nodeAffinity := range strategy.Params.NodeAffinityType {
+	for _, nodeAffinity := range strategy.Params.NodeAffinityType.List {
 		klog.V(2).InfoS("Executing for nodeAffinityType", "nodeAffinity", nodeAffinity)
 
 		switch nodeAffinity {
@@ -85,7 +85,7 @@ func RemovePodsViolatingNodeAffinity(ctx context.Context, client clientset.Inter
 					}),
 					podutil.WithNamespaces(includedNamespaces),
 					podutil.WithoutNamespaces(excludedNamespaces),
-					podutil.WithLabelSelector(strategy.Params.LabelSelector),
+					podutil.WithLabelSelector(strategy.Params.NodeAffinityType.LabelSelector),
 				)
 				if err != nil {
 					klog.ErrorS(err, "Failed to get pods", "node", klog.KObj(node))

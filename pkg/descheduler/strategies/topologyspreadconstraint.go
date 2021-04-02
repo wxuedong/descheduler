@@ -47,23 +47,23 @@ type topology struct {
 
 func validateAndParseTopologySpreadParams(ctx context.Context, client clientset.Interface, params *api.StrategyParameters) (int32, sets.String, sets.String, error) {
 	var includedNamespaces, excludedNamespaces sets.String
-	if params == nil {
+	if params == nil || params.RemovePodsViolatingTopologySpreadConstraint == nil{
 		return 0, includedNamespaces, excludedNamespaces, nil
 	}
 	// At most one of include/exclude can be set
-	if params.Namespaces != nil && len(params.Namespaces.Include) > 0 && len(params.Namespaces.Exclude) > 0 {
+	if params.RemovePodsViolatingTopologySpreadConstraint.Namespaces != nil && len(params.RemovePodsViolatingTopologySpreadConstraint.Namespaces.Include) > 0 && len(params.RemovePodsViolatingTopologySpreadConstraint.Namespaces.Exclude) > 0 {
 		return 0, includedNamespaces, excludedNamespaces, fmt.Errorf("only one of Include/Exclude namespaces can be set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.RemovePodsViolatingTopologySpreadConstraint.ThresholdPriority != nil && params.RemovePodsViolatingTopologySpreadConstraint.ThresholdPriorityClassName != "" {
 		return 0, includedNamespaces, excludedNamespaces, fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 	thresholdPriority, err := utils.GetPriorityFromStrategyParams(ctx, client, params)
 	if err != nil {
 		return 0, includedNamespaces, excludedNamespaces, fmt.Errorf("failed to get threshold priority from strategy's params: %+v", err)
 	}
-	if params.Namespaces != nil {
-		includedNamespaces = sets.NewString(params.Namespaces.Include...)
-		excludedNamespaces = sets.NewString(params.Namespaces.Exclude...)
+	if params.RemovePodsViolatingTopologySpreadConstraint.Namespaces != nil {
+		includedNamespaces = sets.NewString(params.RemovePodsViolatingTopologySpreadConstraint.Namespaces.Include...)
+		excludedNamespaces = sets.NewString(params.RemovePodsViolatingTopologySpreadConstraint.Namespaces.Exclude...)
 	}
 
 	return thresholdPriority, includedNamespaces, excludedNamespaces, nil
@@ -126,7 +126,7 @@ func RemovePodsViolatingTopologySpreadConstraint(
 		for _, pod := range namespacePods.Items {
 			for _, constraint := range pod.Spec.TopologySpreadConstraints {
 				// Ignore soft topology constraints if they are not included
-				if (strategy.Params == nil || !strategy.Params.IncludeSoftConstraints) && constraint.WhenUnsatisfiable != v1.DoNotSchedule {
+				if (strategy.Params == nil || !strategy.Params.RemovePodsViolatingTopologySpreadConstraint.IncludeSoftConstraints) && constraint.WhenUnsatisfiable != v1.DoNotSchedule {
 					continue
 				}
 				namespaceTopologySpreadConstraints[constraint] = struct{}{}

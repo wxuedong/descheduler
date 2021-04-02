@@ -36,10 +36,10 @@ func validateRemovePodsHavingTooManyRestartsParams(params *api.StrategyParameter
 	}
 
 	// At most one of include/exclude can be set
-	if params.Namespaces != nil && len(params.Namespaces.Include) > 0 && len(params.Namespaces.Exclude) > 0 {
+	if params.PodsHavingTooManyRestarts.Namespaces != nil && len(params.PodsHavingTooManyRestarts.Namespaces.Include) > 0 && len(params.PodsHavingTooManyRestarts.Namespaces.Exclude) > 0 {
 		return fmt.Errorf("only one of Include/Exclude namespaces can be set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.PodsHavingTooManyRestarts.ThresholdPriority != nil && params.PodsHavingTooManyRestarts.ThresholdPriorityClassName != "" {
 		return fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 
@@ -62,9 +62,9 @@ func RemovePodsHavingTooManyRestarts(ctx context.Context, client clientset.Inter
 	}
 
 	var includedNamespaces, excludedNamespaces []string
-	if strategy.Params.Namespaces != nil {
-		includedNamespaces = strategy.Params.Namespaces.Include
-		excludedNamespaces = strategy.Params.Namespaces.Exclude
+	if strategy.Params.PodsHavingTooManyRestarts.Namespaces != nil {
+		includedNamespaces = strategy.Params.PodsHavingTooManyRestarts.Namespaces.Include
+		excludedNamespaces = strategy.Params.PodsHavingTooManyRestarts.Namespaces.Exclude
 	}
 
 	evictable := podEvictor.Evictable(evictions.WithPriorityThreshold(thresholdPriority))
@@ -78,7 +78,7 @@ func RemovePodsHavingTooManyRestarts(ctx context.Context, client clientset.Inter
 			podutil.WithFilter(evictable.IsEvictable),
 			podutil.WithNamespaces(includedNamespaces),
 			podutil.WithoutNamespaces(excludedNamespaces),
-			podutil.WithLabelSelector(strategy.Params.LabelSelector),
+			podutil.WithLabelSelector(strategy.Params.PodsHavingTooManyRestarts.LabelSelector),
 		)
 		if err != nil {
 			klog.ErrorS(err, "Error listing a nodes pods", "node", klog.KObj(node))

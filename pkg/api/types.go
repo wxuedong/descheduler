@@ -67,19 +67,16 @@ type Namespaces struct {
 }
 
 // Besides Namespaces only one of its members may be specified
-// TODO(jchaloup): move Namespaces ThresholdPriority and ThresholdPriorityClassName to individual strategies
-//  once the policy version is bumped to v1alpha2
+// once the policy version is bumped to v1alpha2
 type StrategyParameters struct {
 	NodeResourceUtilizationThresholds *NodeResourceUtilizationThresholds
-	NodeAffinityType                  []string
+	NodeAffinityType                  *NodeAffinityType
 	PodsHavingTooManyRestarts         *PodsHavingTooManyRestarts
 	PodLifeTime                       *PodLifeTime
 	RemoveDuplicates                  *RemoveDuplicates
-	IncludeSoftConstraints            bool
-	Namespaces                        *Namespaces
-	ThresholdPriority                 *int32
-	ThresholdPriorityClassName        string
-	LabelSelector                     *metav1.LabelSelector
+	RemovePodsViolatingNodeTaints     *RemovePodsViolatingNodeTaints
+	RemovePodsViolatingInterPodAntiAffinity *RemovePodsViolatingInterPodAntiAffinity
+	RemovePodsViolatingTopologySpreadConstraint *RemovePodsViolatingTopologySpreadConstraint
 }
 
 type Percentage float64
@@ -89,18 +86,46 @@ type NodeResourceUtilizationThresholds struct {
 	Thresholds       ResourceThresholds
 	TargetThresholds ResourceThresholds
 	NumberOfNodes    int
+	*Filter
+}
+
+type NodeAffinityType struct {
+	List []string
+	*Filter
 }
 
 type PodsHavingTooManyRestarts struct {
 	PodRestartThreshold     int32
 	IncludingInitContainers bool
+	*Filter
 }
 
 type RemoveDuplicates struct {
 	ExcludeOwnerKinds []string
+	*Filter
 }
 
 type PodLifeTime struct {
 	MaxPodLifeTimeSeconds *uint
 	PodStatusPhases       []string
+	*Filter
+}
+
+type RemovePodsViolatingNodeTaints struct {
+	*Filter
+}
+
+type RemovePodsViolatingInterPodAntiAffinity struct {
+	*Filter
+}
+
+type RemovePodsViolatingTopologySpreadConstraint struct {
+	*Filter
+}
+type Filter struct {
+	IncludeSoftConstraints     bool
+	Namespaces                 *Namespaces
+	ThresholdPriority          *int32
+	ThresholdPriorityClassName string
+	LabelSelector              *metav1.LabelSelector
 }

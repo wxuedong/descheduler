@@ -32,15 +32,15 @@ import (
 )
 
 func validateRemovePodsViolatingNodeTaintsParams(params *api.StrategyParameters) error {
-	if params == nil {
+	if params == nil || params.RemovePodsViolatingNodeTaints == nil{
 		return nil
 	}
 
 	// At most one of include/exclude can be set
-	if params.Namespaces != nil && len(params.Namespaces.Include) > 0 && len(params.Namespaces.Exclude) > 0 {
+	if params.RemovePodsViolatingNodeTaints.Namespaces != nil && len(params.RemovePodsViolatingNodeTaints.Namespaces.Include) > 0 && len(params.RemovePodsViolatingNodeTaints.Namespaces.Exclude) > 0 {
 		return fmt.Errorf("only one of Include/Exclude namespaces can be set")
 	}
-	if params.ThresholdPriority != nil && params.ThresholdPriorityClassName != "" {
+	if params.RemovePodsViolatingNodeTaints.ThresholdPriority != nil && params.RemovePodsViolatingNodeTaints.ThresholdPriorityClassName != "" {
 		return fmt.Errorf("only one of thresholdPriority and thresholdPriorityClassName can be set")
 	}
 
@@ -57,11 +57,11 @@ func RemovePodsViolatingNodeTaints(ctx context.Context, client clientset.Interfa
 	var includedNamespaces, excludedNamespaces []string
 	var labelSelector *metav1.LabelSelector
 	if strategy.Params != nil {
-		if strategy.Params.Namespaces != nil {
-			includedNamespaces = strategy.Params.Namespaces.Include
-			excludedNamespaces = strategy.Params.Namespaces.Exclude
+		if strategy.Params.RemovePodsViolatingNodeTaints.Namespaces != nil {
+			includedNamespaces = strategy.Params.RemovePodsViolatingNodeTaints.Namespaces.Include
+			excludedNamespaces = strategy.Params.RemovePodsViolatingNodeTaints.Namespaces.Exclude
 		}
-		labelSelector = strategy.Params.LabelSelector
+		labelSelector = strategy.Params.RemovePodsViolatingNodeTaints.LabelSelector
 	}
 
 	thresholdPriority, err := utils.GetPriorityFromStrategyParams(ctx, client, strategy.Params)
