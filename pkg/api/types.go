@@ -69,13 +69,13 @@ type Namespaces struct {
 // Besides Namespaces only one of its members may be specified
 // once the policy version is bumped to v1alpha2
 type StrategyParameters struct {
-	NodeResourceUtilizationThresholds *NodeResourceUtilizationThresholds
-	NodeAffinityType                  *NodeAffinityType
-	PodsHavingTooManyRestarts         *PodsHavingTooManyRestarts
-	PodLifeTime                       *PodLifeTime
-	RemoveDuplicates                  *RemoveDuplicates
-	RemovePodsViolatingNodeTaints     *RemovePodsViolatingNodeTaints
-	RemovePodsViolatingInterPodAntiAffinity *RemovePodsViolatingInterPodAntiAffinity
+	NodeResourceUtilizationThresholds           *NodeResourceUtilizationThresholds
+	NodeAffinityType                            *NodeAffinityType
+	PodsHavingTooManyRestarts                   *PodsHavingTooManyRestarts
+	PodLifeTime                                 *PodLifeTime
+	RemoveDuplicates                            *RemoveDuplicates
+	RemovePodsViolatingNodeTaints               *RemovePodsViolatingNodeTaints
+	RemovePodsViolatingInterPodAntiAffinity     *RemovePodsViolatingInterPodAntiAffinity
 	RemovePodsViolatingTopologySpreadConstraint *RemovePodsViolatingTopologySpreadConstraint
 }
 

@@ -68,16 +68,14 @@ type Namespaces struct {
 
 // Besides Namespaces ThresholdPriority and ThresholdPriorityClassName only one of its members may be specified
 type StrategyParameters struct {
-	NodeResourceUtilizationThresholds *NodeResourceUtilizationThresholds `json:"nodeResourceUtilizationThresholds,omitempty"`
-	NodeAffinityType                  []string                           `json:"nodeAffinityType,omitempty"`
-	PodsHavingTooManyRestarts         *PodsHavingTooManyRestarts         `json:"podsHavingTooManyRestarts,omitempty"`
-	PodLifeTime                       *PodLifeTime                       `json:"podLifeTime,omitempty"`
-	RemoveDuplicates                  *RemoveDuplicates                  `json:"removeDuplicates,omitempty"`
-	IncludeSoftConstraints            bool                               `json:"includeSoftConstraints"`
-	Namespaces                        *Namespaces                        `json:"namespaces"`
-	ThresholdPriority                 *int32                             `json:"thresholdPriority"`
-	ThresholdPriorityClassName        string                             `json:"thresholdPriorityClassName"`
-	LabelSelector                     *metav1.LabelSelector              `json:"labelSelector"`
+	NodeResourceUtilizationThresholds           *NodeResourceUtilizationThresholds           `json:"nodeResourceUtilizationThresholds,omitempty"`
+	NodeAffinityType                            *RemoveDuplicates                            `json:"nodeAffinityType,omitempty"`
+	PodsHavingTooManyRestarts                   *PodsHavingTooManyRestarts                   `json:"podsHavingTooManyRestarts,omitempty"`
+	PodLifeTime                                 *PodLifeTime                                 `json:"podLifeTime,omitempty"`
+	RemoveDuplicates                            *RemoveDuplicates                            `json:"removeDuplicates,omitempty"`
+	RemovePodsViolatingNodeTaints               *RemovePodsViolatingNodeTaints               `json:"removePodsViolatingNodeTaints,omitempty"`
+	RemovePodsViolatingInterPodAntiAffinity     *RemovePodsViolatingInterPodAntiAffinity     `json:"removePodsViolatingInterPodAntiAffinity,omitempty"`
+	RemovePodsViolatingTopologySpreadConstraint *RemovePodsViolatingTopologySpreadConstraint `json:"removePodsViolatingTopologySpreadConstraint,omitempty"`
 }
 
 type Percentage float64
@@ -87,18 +85,41 @@ type NodeResourceUtilizationThresholds struct {
 	Thresholds       ResourceThresholds `json:"thresholds,omitempty"`
 	TargetThresholds ResourceThresholds `json:"targetThresholds,omitempty"`
 	NumberOfNodes    int                `json:"numberOfNodes,omitempty"`
+	*Filter
 }
 
 type PodsHavingTooManyRestarts struct {
 	PodRestartThreshold     int32 `json:"podRestartThreshold,omitempty"`
 	IncludingInitContainers bool  `json:"includingInitContainers,omitempty"`
+	*Filter
 }
 
 type RemoveDuplicates struct {
 	ExcludeOwnerKinds []string `json:"excludeOwnerKinds,omitempty"`
+	*Filter
 }
 
 type PodLifeTime struct {
 	MaxPodLifeTimeSeconds *uint    `json:"maxPodLifeTimeSeconds,omitempty"`
 	PodStatusPhases       []string `json:"podStatusPhases,omitempty"`
+	*Filter
+}
+
+type RemovePodsViolatingNodeTaints struct {
+	*Filter
+}
+
+type RemovePodsViolatingInterPodAntiAffinity struct {
+	*Filter
+}
+
+type RemovePodsViolatingTopologySpreadConstraint struct {
+	*Filter
+}
+type Filter struct {
+	IncludeSoftConstraints     bool                  `json:"includeSoftConstraints"`
+	Namespaces                 *Namespaces           `json:"namespaces"`
+	ThresholdPriority          *int32                `json:"thresholdPriority"`
+	ThresholdPriorityClassName string                `json:"thresholdPriorityClassName"`
+	LabelSelector              *metav1.LabelSelector `json:"labelSelector"`
 }
