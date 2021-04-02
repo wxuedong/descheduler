@@ -226,10 +226,9 @@ func TestPodLifeTime(t *testing.T) {
 			strategy: api.DeschedulerStrategy{
 				Enabled: true,
 				Params: &api.StrategyParameters{
-					PodLifeTime: &api.PodLifeTime{MaxPodLifeTimeSeconds: &maxLifeTime},
-					LabelSelector: &metav1.LabelSelector{
+					PodLifeTime: &api.PodLifeTime{MaxPodLifeTimeSeconds: &maxLifeTime,Filter:&api.Filter{LabelSelector:&metav1.LabelSelector{
 						MatchLabels: map[string]string{"foo": "bar"},
-					},
+					} }},
 				},
 			},
 			maxPodsToEvictPerNode:   5,
